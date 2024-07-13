@@ -16,8 +16,8 @@ template <class T>
 std::optional<T> try_parse_num(std::string_view str)
 {
     T value;
-    auto res = std::from_chars(str.data(), str.data()+str.size(), value);
-    if (res.ec == std::errc() && res.ptr == str.data()+str.size()) {
+    auto res = std::from_chars(str.data(), str.data() + str.size(), value);
+    if (res.ec == std::errc() && res.ptr == str.data() + str.size()) {
         return value;
     }
     return std::nullopt;
@@ -34,11 +34,17 @@ JsonObject parser(std::string_view json)
         std::cmatch match;
         if (std::regex_search(json.data(), json.data() + json.size(), match, mun_re)) {
             std::string str = match.str();
-            if (auto num = try_parse_num<int>(str); num.has_value()) {
-                return JsonObject { num.value() };
+            {
+                auto num = try_parse_num<int>(str);
+                if (num.has_value()) {
+                    return JsonObject { num.value() };
+                }
             }
-            if (auto num = try_parse_num<double>(str); num.has_value()) {
-                return JsonObject { num.value() };
+            {
+                auto num = try_parse_num<double>(str);
+                if (num.has_value()) {
+                    return JsonObject { num.value() };
+                }
             }
         }
     }
